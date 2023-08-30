@@ -51,6 +51,7 @@ ORDER BY name
 LIMIT 25;`
 
 [//]: # (Determine which customer watch how many movies of particular actor.)
+
 `SELECT
 c.customer_id,
 c.first_name,
@@ -67,3 +68,30 @@ JOIN actor a ON fa.actor_id = a.actor_id
 GROUP BY c.customer_id, c.first_name, c.last_name, a.actor_id, a.first_name, c.first_name, c.last_name, a.actor_id, c.customer_id
 ORDER BY MoviesWatched DESC;`
 
+[//]: # (List the top 3 actors having done maximum sci-fi movies and with maximum rental rates)
+
+`SELECT a.first_name AS Actor_Name,COUNT(*) AS Number_of_SciFi_Movies
+FROM actor a
+JOIN film_actor fa ON a.actor_id = fa.actor_id
+JOIN film f ON fa.film_id = f.film_id
+JOIN film_category fc ON f.film_id = fc.film_id
+JOIN category c ON fc.category_id = c.category_id
+WHERE c.name = 'Sci-Fi'
+GROUP BY a.first_name, a.actor_id, a.actor_id
+ORDER BY Number_of_SciFi_Movies DESC
+LIMIT 3;`
+
+[//]: # (Find all actors who acted in more than one language. Output should contain actor_name, language. Sorted by languages, actor_name.)
+
+`SELECT DISTINCT a.first_name AS Actor_Name, l.name AS Language
+FROM actor a
+JOIN film_actor fa ON a.actor_id = fa.actor_id
+JOIN film f ON fa.film_id = f.film_id
+JOIN language l ON f.language_id = l.language_id
+WHERE a.actor_id IN (
+SELECT actor_id
+FROM film_actor
+GROUP BY actor_id
+HAVING COUNT(DISTINCT film_id) > 1
+)
+ORDER BY l.name, a.first_name;`

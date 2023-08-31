@@ -174,12 +174,24 @@ on fc.category_id = c.category_id
 group by c.name`
 
 [//]: # (List out top 10 most revenue generated district to release animated film with average price running on that district)
-`Select address.district, sum(amount) as total_amount
-from address
-inner join customer on address.address_id = customer.address_id
-inner join payment on customer.customer_id = payment.customer_id
-inner join rental on customer.customer_id = rental.customer_id
-inner join inventory on rental.inventory_id = inventory.inventory_id
-inner join film on inventory.film_id = film.film_id
-group by address.district, payment.customer_id
-order by sum(amount);`
+
+`select address.district, round(avg(rental_rate), 2)
+from film
+inner join film_category
+on film.film_id = film_category.film_id
+inner join category
+on film_category.category_id = category.category_id
+inner join inventory
+on film.film_id = inventory.film_id
+inner join rental
+on inventory.inventory_id = rental.inventory_id
+inner join payment
+on rental.rental_id = payment.rental_id
+inner join customer
+on payment.customer_id = customer.customer_id
+inner join address
+on customer.address_id = address.address_id
+where category.name = 'Animation'
+group by address.district
+order by sum(amount) desc
+LIMIT 10`

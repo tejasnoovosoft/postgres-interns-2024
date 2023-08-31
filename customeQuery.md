@@ -25,13 +25,15 @@ LIMIT 5;`
 
 [//]: # (--Find the Location of stores whose goods are used for making films whose release year is 2005.)
 
-`SELECT DISTINCT s.staff_id, a.address
-FROM staff s
-JOIN rental r ON s.staff_id = r.staff_id
-JOIN inventory i ON r.inventory_id = i.inventory_id
-JOIN film f ON i.film_id = f.film_id
-JOIN address a ON s.address_id = a.address_id
-WHERE f.release_year = 2006;`
+`Select a.district, film.film_id
+from address a
+inner join store on a.address_id = store.address_id
+inner join staff on store.address_id = staff.address_id
+inner join rental on staff.staff_id = rental.staff_id
+inner join inventory on rental.inventory_id = inventory.inventory_id
+inner join film on film.film_id = inventory.film_id
+where film.release_year = 2006
+group by a.district, film.film_id;`
 
 [//]: # (-- select the staffs firstname and lastname in one column and their whole payment)
 
@@ -103,33 +105,29 @@ ORDER BY l.name, Actor_Name;`
 list out all films
 
 [//]: # (with highest rental rate  and classify the films labelled as "inappropriate for children under 13" with ratings PG-13 , "General" with ratings as G and " Restricted for Age below 18" with ratings as R)
-```postgresql
-with table2 as (select description,
-                       case
-                           when rating = 'PG-13' then 'inappropriate for children under 13'
-                           when rating = 'G' then 'General'
-                           when rating = 'R' then 'Restricted for Age below 18'
-                           end as Category
-                from (select description, rating, max(rental_rate) from film group by description, rating) as sub)
 
-select description, category
+`with table2 as (select description,
+case
+when rating = 'PG-13' then 'inappropriate for children under 13'
+when rating = 'G' then 'General'
+when rating = 'R' then 'Restricted for Age below 18'
+end as Category  from
+(select description , rating ,max(rental_rate) from film group by description ,rating) as sub)
+select description , category
 from table2 tab
-where category is not null
-```
+where category is not null`
 
 [//]: # (1&#41; Find the Indian Staff whose goods are used in making Hindi films with language id 1.)
-```postgresql
-   Select count(*)
-   from country c
-       inner join city c2 on c.country_id = c2.country_id
-       inner join public.address a on c2.city_id = a.city_id
-       inner join staff s on a.address_id = s.address_id
-       inner join rental r on s.staff_id = r.staff_id
-       inner join inventory i on r.inventory_id = i.inventory_id
-       inner join film f on i.film_id = f.film_id
-   where c.country = 'India'
-   and f.language_id = 1;
-```
+
+`Select count(*) from country c
+inner join city c2 on c.country_id = c2.country_id
+inner join public.address a on c2.city_id = a.city_id
+inner join staff s on a.address_id = s.address_id
+inner join rental r on s.staff_id = r.staff_id
+inner join inventory i on r.inventory_id = i.inventory_id
+inner join film f on i.film_id = f.film_id
+where c.country = 'India'
+and f.language_id = 1;`
 
 [//]: # (What are the top 10 films that have been rented by customers in the United States, and how many times have they been rented?)
 
